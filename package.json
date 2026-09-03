@@ -1,0 +1,22 @@
+{
+  "name": "assettrack",
+  "version": "1.0.0",
+  "description": "Simple IT asset tracking application for managing company equipment, assignments, warranties and maintenance history.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "asset-tracking",
+    "nodejs",
+    "sqlite",
+    "javascript"
+  ],
+  "author": "Harmanbir Kaur",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^5.1.0"
+  }
+}
