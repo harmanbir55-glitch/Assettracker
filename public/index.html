@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AssetTrack</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>AssetTrack</h1>
+      <p>IT equipment and lifecycle tracking</p>
+    </div>
+    <button id="addAssetBtn" class="primary-button">+ Add Asset</button>
+  </header>
+
+  <main class="page">
+    <section class="cards" aria-label="Asset summary">
+      <article class="card">
+        <span>Total Assets</span>
+        <strong id="totalCount">0</strong>
+      </article>
+      <article class="card">
+        <span>Assigned</span>
+        <strong id="assignedCount">0</strong>
+      </article>
+      <article class="card">
+        <span>Available</span>
+        <strong id="availableCount">0</strong>
+      </article>
+      <article class="card">
+        <span>In Repair</span>
+        <strong id="repairCount">0</strong>
+      </article>
+      <article class="card">
+        <span>Warranty ≤ 90 days</span>
+        <strong id="warrantyCount">0</strong>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Company Assets</h2>
+          <p>Search, assign and maintain company equipment.</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input id="searchInput" type="search" placeholder="Search asset tag, model, serial or employee">
+        <select id="statusFilter">
+          <option value="">All statuses</option>
+          <option>Available</option>
+          <option>Assigned</option>
+          <option>Repair</option>
+          <option>Retired</option>
+        </select>
+        <select id="typeFilter">
+          <option value="">All types</option>
+          <option>Laptop</option>
+          <option>Desktop</option>
+          <option>Monitor</option>
+          <option>Phone</option>
+          <option>Tablet</option>
+          <option>Printer</option>
+          <option>Other</option>
+        </select>
+        <button id="clearFiltersBtn" class="secondary-button">Clear</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Asset Tag</th>
+              <th>Device</th>
+              <th>Status</th>
+              <th>Assigned To</th>
+              <th>Warranty</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="assetTableBody"></tbody>
+        </table>
+      </div>
+      <p id="emptyMessage" class="empty-message" hidden>No assets match the current filters.</p>
+    </section>
+  </main>
+
+  <dialog id="assetDialog">
+    <form id="assetForm" method="dialog">
+      <div class="dialog-header">
+        <div>
+          <h2 id="assetDialogTitle">Add Asset</h2>
+          <p>Enter the device details below.</p>
+        </div>
+        <button type="button" class="icon-button" data-close="assetDialog" aria-label="Close">×</button>
+      </div>
+
+      <input id="assetId" type="hidden">
+
+      <div class="form-grid">
+        <label>
+          Asset Tag *
+          <input id="assetTag" required placeholder="LT-1010">
+        </label>
+        <label>
+          Type *
+          <select id="assetType" required>
+            <option value="">Select type</option>
+            <option>Laptop</option>
+            <option>Desktop</option>
+            <option>Monitor</option>
+            <option>Phone</option>
+            <option>Tablet</option>
+            <option>Printer</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>
+          Brand *
+          <input id="brand" required placeholder="Dell">
+        </label>
+        <label>
+          Model *
+          <input id="model" required placeholder="Latitude 5440">
+        </label>
+        <label>
+          Serial Number
+          <input id="serialNumber" placeholder="Serial number">
+        </label>
+        <label>
+          Status
+          <select id="status">
+            <option>Available</option>
+            <option>Assigned</option>
+            <option>Repair</option>
+            <option>Retired</option>
+          </select>
+        </label>
+        <label>
+          Assigned Employee
+          <select id="employeeId">
+            <option value="">Unassigned</option>
+          </select>
+        </label>
+        <label>
+          Purchase Date
+          <input id="purchaseDate" type="date">
+        </label>
+        <label>
+          Warranty End
+          <input id="warrantyEnd" type="date">
+        </label>
+        <label class="full-width">
+          Notes
+          <textarea id="notes" rows="3" placeholder="Optional notes"></textarea>
+        </label>
+      </div>
+
+      <p id="assetFormMessage" class="form-message"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="secondary-button" data-close="assetDialog">Cancel</button>
+        <button type="submit" class="primary-button">Save Asset</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detailsDialog">
+    <div class="dialog-header">
+      <div>
+        <h2 id="detailsTitle">Asset Details</h2>
+        <p id="detailsSubtitle"></p>
+      </div>
+      <button type="button" class="icon-button" data-close="detailsDialog" aria-label="Close">×</button>
+    </div>
+
+    <div id="assetDetails" class="details-grid"></div>
+
+    <div class="section-heading">
+      <div>
+        <h3>Maintenance History</h3>
+        <p>Record repairs and service work for this asset.</p>
+      </div>
+      <button id="addMaintenanceBtn" class="secondary-button">Add Record</button>
+    </div>
+
+    <div id="maintenanceList" class="maintenance-list"></div>
+  </dialog>
+
+  <dialog id="maintenanceDialog">
+    <form id="maintenanceForm" method="dialog">
+      <div class="dialog-header">
+        <div>
+          <h2>Add Maintenance Record</h2>
+          <p>Record an issue and the action taken.</p>
+        </div>
+        <button type="button" class="icon-button" data-close="maintenanceDialog" aria-label="Close">×</button>
+      </div>
+
+      <input id="maintenanceAssetId" type="hidden">
+
+      <div class="form-grid">
+        <label>
+          Service Date *
+          <input id="serviceDate" type="date" required>
+        </label>
+        <label>
+          Cost ($)
+          <input id="serviceCost" type="number" min="0" step="0.01" value="0">
+        </label>
+        <label class="full-width">
+          Issue *
+          <input id="serviceIssue" required placeholder="Battery not charging">
+        </label>
+        <label class="full-width">
+          Action Taken *
+          <textarea id="actionTaken" rows="3" required placeholder="Replaced battery and tested charging"></textarea>
+        </label>
+      </div>
+
+      <p id="maintenanceFormMessage" class="form-message"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="secondary-button" data-close="maintenanceDialog">Cancel</button>
+        <button type="submit" class="primary-button">Save Record</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
